@@ -1,0 +1,36 @@
+# Met à jour automatiquement la base en ligne, sans que ton ordinateur
+# soit allumé. Tourne du lundi au vendredi après la clôture de la BRVM.
+name: Mise a jour quotidienne BRVM
+
+on:
+  schedule:
+    # 23h00 UTC = après la publication des cours du jour par la BRVM.
+    # Du lundi au vendredi uniquement (pas de séance le week-end).
+    - cron: "0 23 * * 1-5"
+  # Permet aussi de lancer la mise à jour à la main depuis l'onglet Actions.
+  workflow_dispatch:
+
+jobs:
+  mise-a-jour:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dependances
+        run: pip install -r requirements.txt
+
+      - name: Recuperer les cours du jour
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scraper_brvm.py
+
+      - name: Recuperer les dividendes
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python dividendes_sika.py
