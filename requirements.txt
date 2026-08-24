@@ -1,0 +1,9 @@
+streamlit
+pandas
+numpy
+plotly
+requests
+lxml
+beautifulsoup4
+sqlalchemy>=2.0
+psycopg[binary]
